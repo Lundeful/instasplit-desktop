@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "allowJs": true,
+        "target": "es6",
+        "module": "commonjs",
+        "sourceMap": true,
+        "strict": true,
+        "outDir": "../build/",
+        "rootDir": "../",
+        "noEmitOnError": true,
+        "typeRoots": ["node_modules/@types"]
+    },
+}
