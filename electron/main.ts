@@ -7,7 +7,7 @@ const isMac = process.platform === 'darwin';
 const isDev = process.env.NODE_ENV === 'development';
 let mainWindow: BrowserWindow;
 
-let selectedFile = null;
+let currentImage: sharp.Sharp;
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -54,7 +54,7 @@ const createWindow = () => {
                     label: 'Open File',
                     accelerator: 'CmdOrCtrl+O',
                     click() {
-                        openFile();
+                        openImage();
                     },
                 },
                 { label: 'Open Folder' },
@@ -152,24 +152,31 @@ app.on('activate', () => {
 });
 
 ipcMain.on('close-app', (event, args) => {
-    console.log("Closing app");
-    
-    // BrowserWindow.getAllWindows().forEach(win => win.close());
+    console.log('Closing app');
+
+    BrowserWindow.getAllWindows().forEach(win => win.close());
     if (!isMac) app.quit();
 });
 
 ipcMain.on('minimize', (event, args) => {
-    console.log("Minimizing");
+    console.log('Minimizing');
     mainWindow.minimize();
 });
 
-ipcMain.on('select-file', (event, args) => {
-    console.log("Selecting file");
-    openFile();
+ipcMain.on('select-image', async (event, args) => {
+    console.log('Selecting image');
+    const path = await openImage();
+
+    if (currentImage != null) mainWindow.webContents.send('filepath-selected', path);
 });
 
-const openFile = () => {
-    dialog
+ipcMain.on('save-image', async (event, args) => {
+    console.log('Saving image');
+    if (currentImage != null) saveImage();
+});
+
+const openImage = async (): Promise<string | undefined> => {
+    return dialog
         .showOpenDialog(mainWindow, {
             properties: ['openFile'],
             filters: [{ name: 'Images', extensions: ['jpg', 'png'] }],
@@ -178,18 +185,21 @@ const openFile = () => {
             if (result.canceled) return;
             const filepath = result.filePaths[0];
             const image = fs.readFileSync(filepath);
-            console.log(image);
             const sharpImage = sharp(image);
-            sharpImage.blur(20);
-
-            dialog.showSaveDialog(mainWindow).then((result) => {
-                console.log(JSON.stringify(result));
-                if (result.canceled) return;
-            
-                sharpImage.toFile(result.filePath + '.png').then(info => {
-                    info.format = 'png';                
-                });
-            });
+            currentImage = sharpImage;
+            return filepath;
         });
 };
 
+const saveImage = () => {
+    if (currentImage) {
+        dialog.showSaveDialog(mainWindow).then((result) => {
+            if (result.canceled) return;
+
+            currentImage.blur(20);
+            currentImage.toFile(result.filePath + '.png').then((info) => {
+                info.format = 'png';
+            });
+        });
+    }
+};

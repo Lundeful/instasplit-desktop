@@ -26,7 +26,7 @@ const CommonButtonStyle = styled.button`
     outline: none;
     border: 2px solid transparent;
     border-radius: 5px;
-	user-select: none;
+    user-select: none;
 
     // Font
     font-size: 16px;
@@ -59,11 +59,19 @@ export const PrimaryButton: FC<ButtonProps> = ({ title, ariaLabel, onClick }: Bu
 const SecondaryButtonStyle = styled(CommonButtonStyle)``;
 
 export const SecondaryButton: FC<ButtonProps> = ({ title, ariaLabel, onClick }: ButtonProps) => {
-    return <SecondaryButtonStyle>{title}</SecondaryButtonStyle>;
+    return (
+        <SecondaryButtonStyle aria-label={ariaLabel} onClick={onClick}>
+            {title}
+        </SecondaryButtonStyle>
+    );
 };
 
 const LinkButtonStyle = styled(CommonButtonStyle)``;
 
 export const LinkButton: FC<ButtonProps> = ({ title, ariaLabel, onClick }: ButtonProps) => {
-    return <LinkButtonStyle>{title}</LinkButtonStyle>;
+    return (
+        <LinkButtonStyle aria-label={ariaLabel} onClick={onClick}>
+            {title}
+        </LinkButtonStyle>
+    );
 };
