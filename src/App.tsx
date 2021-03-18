@@ -29,7 +29,7 @@ function App() {
                 {filePath && (
                     <SplitContainer>
                         <FilePath>{filePath}</FilePath>
-                        <SecondaryButton title='Split Image' onClick={() => electron.send('save-image')} />{' '}
+                        <SecondaryButton title='Split Image' onClick={() => electron.send('split-image')} />{' '}
                     </SplitContainer>
                 )}
             </LandingPage>

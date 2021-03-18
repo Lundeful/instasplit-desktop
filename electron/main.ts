@@ -7,7 +7,10 @@ const isMac = process.platform === 'darwin';
 const isDev = process.env.NODE_ENV === 'development';
 let mainWindow: BrowserWindow;
 
-let currentImage: sharp.Sharp;
+
+const numberOfSplitImages = 3;
+let rawImage: sharp.Sharp;
+let splitImages: sharp.Sharp[] = [];
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -154,7 +157,7 @@ app.on('activate', () => {
 ipcMain.on('close-app', (event, args) => {
     console.log('Closing app');
 
-    BrowserWindow.getAllWindows().forEach(win => win.close());
+    BrowserWindow.getAllWindows().forEach((win) => win.close());
     if (!isMac) app.quit();
 });
 
@@ -167,12 +170,14 @@ ipcMain.on('select-image', async (event, args) => {
     console.log('Selecting image');
     const path = await openImage();
 
-    if (currentImage != null) mainWindow.webContents.send('filepath-selected', path);
+    if (rawImage != null) mainWindow.webContents.send('filepath-selected', path);
 });
 
-ipcMain.on('save-image', async (event, args) => {
-    console.log('Saving image');
-    if (currentImage != null) saveImage();
+ipcMain.on('split-image', async (event, args) => {
+    console.log('Splitting image');
+    if (rawImage != null) {
+        saveImage();
+    }
 });
 
 const openImage = async (): Promise<string | undefined> => {
@@ -186,20 +191,49 @@ const openImage = async (): Promise<string | undefined> => {
             const filepath = result.filePaths[0];
             const image = fs.readFileSync(filepath);
             const sharpImage = sharp(image);
-            currentImage = sharpImage;
+            rawImage = sharpImage;
             return filepath;
         });
 };
 
+
+const splitImage = (): void => {
+    if (rawImage) {
+    }
+};
+
 const saveImage = () => {
-    if (currentImage) {
-        dialog.showSaveDialog(mainWindow).then((result) => {
+    if (rawImage) {
+        dialog.showSaveDialog(mainWindow).then(async (result) => {
             if (result.canceled) return;
 
-            currentImage.blur(20);
-            currentImage.toFile(result.filePath + '.png').then((info) => {
-                info.format = 'png';
-            });
+            const { width, height } = await getImageDimensions(rawImage);
+            if (width && height) {
+                const splitWidth = Math.floor(width / 3);
+                const splitHeight = Math.floor(splitWidth * height/width);
+                const topOffset = Math.floor(height/2 - splitHeight/2);
+
+                for (let index = 0; index < numberOfSplitImages; index++) {
+                    const splitImage = rawImage.clone();
+                    const leftOffset = splitWidth * index;
+
+                    splitImage.extract({left: leftOffset, top: topOffset, width: splitWidth, height: splitHeight});
+                    splitImages.push(splitImage);
+                }
+
+                splitImages.forEach((img, index) => {
+                    img.toFile(`${result.filePath}_split_${index+1}.png`).then((info) => {
+                        info.format = 'png';
+                    });
+                })
+                console.log("Done");
+            }
         });
     }
+};
+
+const getImageDimensions = (image: sharp.Sharp) => {
+    return image.metadata().then((meta) => {
+        return { width: meta.width, height: meta.height };
+    });
 };
