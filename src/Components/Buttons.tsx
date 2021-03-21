@@ -8,7 +8,7 @@ interface ButtonProps {
 }
 
 enum ButtonColors {
-    Primary = '#27c190',
+    Primary = '#4fbb9b',
     PrimaryHover = '#2acc99',
     PrimaryFocus = '#25b688',
     PrimaryOutline = '#1e946f',

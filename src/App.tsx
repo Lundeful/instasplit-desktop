@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { PrimaryButton, SecondaryButton } from './Components/Buttons';
+import { Titlebar } from './Components/Titlebar';
 import { Colors } from './Enums/Colors';
-import electron from './Interfaces/Electron';
+import electron, { ReceiveChannels, SendChannels } from './Api/Electron';
 
 function App() {
     const [filePath, setFilePath] = useState<string>('');
 
     const handleSelectFile = () => {
-        electron.send('select-image');
+        electron.send(SendChannels.openSelectFileDialog);
     };
 
     useEffect(() => {
-        electron.receive('filepath-selected', (path: any) => setFilePath(path));
+        electron.receive(ReceiveChannels.fileSelected, (path: any) => setFilePath(path));
     }, []);
 
     return (
         <AppContainer>
+            <Titlebar />
             <LandingPage>
                 <Header>Welcome to Instasplit</Header>
                 <Introduction>
@@ -29,7 +31,7 @@ function App() {
                 {filePath && (
                     <SplitContainer>
                         <FilePath>{filePath}</FilePath>
-                        <SecondaryButton title='Split Image' onClick={() => electron.send('split-image')} />{' '}
+                        <SecondaryButton title='Split Image' onClick={() => electron.send(SendChannels.splitImage)} />{' '}
                     </SplitContainer>
                 )}
             </LandingPage>
@@ -38,10 +40,10 @@ function App() {
 }
 
 const AppContainer = styled.div`
-    max-width: 95%;
+    width: 100%;
     margin: auto;
     overflow: hidden;
-    background-color: ${Colors.main};
+    background-color: ${Colors.blue300};
     user-select: none;
 `;
 

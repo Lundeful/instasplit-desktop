@@ -2,8 +2,6 @@ import { contextBridge, ipcRenderer } from 'electron';
 
 contextBridge.exposeInMainWorld('electron', {
     send: (channel: string, data: any) => {
-        console.log('Seeending');
-
         return ipcRenderer.send(channel, data);
     },
     subscribe: (channel: string, listener: any) => {
@@ -15,8 +13,6 @@ contextBridge.exposeInMainWorld('electron', {
         };
     },
     receive: (channel: string, func: any) => {
-        console.log('Yoyoyoy');
-
         let validChannels = ['filepath-selected', 'minimize', 'open-file'];
         if (validChannels.includes(channel) || true) {
             // Deliberately strip event as it includes `sender`
