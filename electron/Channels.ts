@@ -9,5 +9,5 @@ export enum ReceiveChannels {
 
 export enum SendChannels {
     fileSelected = 'filepath-selected',
-	isMaximized = 'isMaximized',
+	isMaximized = 'is-maximized',
 }

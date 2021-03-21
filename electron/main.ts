@@ -16,6 +16,8 @@ const createWindow = () => {
     mainWindow = new BrowserWindow({
         width: 1000 * 1.25,
         height: 600 * 1.25,
+        minHeight: 300,
+        minWidth: 400,
         frame: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
@@ -44,54 +46,47 @@ app.on('activate', () => {
 });
 
 const addListeners = (mainWindow: BrowserWindow) => {
-    mainWindow.on('resize', sendIsMaximised);
     mainWindow.on('minimize', sendIsMaximised);
     mainWindow.on('restore', sendIsMaximised);
     mainWindow.on('maximize', sendIsMaximised);
+    mainWindow.on('resized', sendIsMaximised);
+    mainWindow.on('moved', sendIsMaximised);
 };
 
 ipcMain.on(ReceiveChannels.closeApp, (event, args) => {
-    console.log('Closing app');
     BrowserWindow.getAllWindows().forEach((win) => win.close());
     if (!isMac) app.quit();
 });
 
 ipcMain.on(ReceiveChannels.minimizeApp, (event, args) => {
-    console.log('Minimizing window');
     mainWindow.minimize();
     sendIsMaximised();
 });
 
 ipcMain.on(ReceiveChannels.maximizeApp, (event, args) => {
-    console.log('Maximizing window');
     if (mainWindow.isMaximizable()) mainWindow.maximize();
     sendIsMaximised();
 });
 
 ipcMain.on(ReceiveChannels.restoreApp, (event, args) => {
-    console.log('Restoring window');
     mainWindow.restore();
     sendIsMaximised();
 });
 
 ipcMain.on(ReceiveChannels.selectImage, async (event, args) => {
-    console.log('Selecting image');
     const path = await openImage();
     if (rawImage != null) mainWindow.webContents.send(SendChannels.fileSelected, path);
 });
 
 const sendIsMaximised = () => {
-    console.log('Sending isMaximized value');
     mainWindow.webContents.send(SendChannels.isMaximized, mainWindow.isMaximized());
 };
 
 ipcMain.on('is-maximized', (event, args) => {
-    console.log('Returning isMaximized');
     return mainWindow.isMaximized();
 });
 
 ipcMain.on(ReceiveChannels.splitImage, async (event, args) => {
-    console.log('Splitting image');
     if (rawImage != null) {
         saveImage();
     }
@@ -142,7 +137,6 @@ const saveImage = () => {
                         info.format = 'png';
                     });
                 });
-                console.log('Done');
             }
         });
     }
