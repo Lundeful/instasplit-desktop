@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from 'electron';
+import { SendChannels } from './Channels';
 
 contextBridge.exposeInMainWorld('electron', {
     send: (channel: string, data: any) => {
@@ -13,7 +14,7 @@ contextBridge.exposeInMainWorld('electron', {
         };
     },
     receive: (channel: string, func: any) => {
-        let validChannels = ['filepath-selected', 'minimize', 'open-file'];
+        const validChannels: string[] = Object.values(SendChannels);
         if (validChannels.includes(channel) || true) {
             // Deliberately strip event as it includes `sender`
             ipcRenderer.on(channel, (event, ...args) => func(...args));

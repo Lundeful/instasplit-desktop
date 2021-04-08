@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, protocol } from 'electron';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as sharp from 'sharp';
@@ -16,8 +16,8 @@ const createWindow = () => {
     mainWindow = new BrowserWindow({
         width: 1000 * 1.25,
         height: 600 * 1.25,
-        minHeight: 300,
-        minWidth: 400,
+        minHeight: 400,
+        minWidth: 600,
         frame: false,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
@@ -31,6 +31,17 @@ const createWindow = () => {
     }
 
     addListeners(mainWindow);
+    const protocolName = 'instasplit'
+    protocol.registerFileProtocol(protocolName, (request, callback) => {
+        const url = request.url.replace(`${protocolName}://`, '')
+        try {
+          return callback(decodeURIComponent(url))
+        }
+        catch (error) {
+          // Handle the error as needed
+          console.error(error)
+        }
+      })
 };
 
 app.whenReady().then(createWindow);
@@ -92,7 +103,7 @@ ipcMain.on(ReceiveChannels.splitImage, async (event, args) => {
     }
 });
 
-const openImage = async (): Promise<string | undefined> => {
+const openImage = async (): Promise<string | undefined | any> => {
     return dialog
         .showOpenDialog(mainWindow, {
             properties: ['openFile'],
@@ -104,7 +115,7 @@ const openImage = async (): Promise<string | undefined> => {
             const image = fs.readFileSync(filepath);
             const sharpImage = sharp(image);
             rawImage = sharpImage;
-            return filepath;
+            return filepath.replace(/\\/g, '\\');
         });
 };
 

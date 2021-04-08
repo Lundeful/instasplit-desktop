@@ -1,7 +1,7 @@
 import React, { FC, useReducer } from 'react';
 
 type Action = { type: ActionTypes; value: string };
-type Dispatch = (action: Action, value: string) => void;
+type Dispatch = (action: Action) => void;
 type State = { filename: string };
 type FileProviderProps = { children: React.ReactNode };
 
@@ -14,7 +14,7 @@ export const FileContext = React.createContext<{ state: State; dispatch: Dispatc
 const fileReducer = (state: State, action: Action) => {
     switch (action.type) {
         case ActionTypes.setfilename: {
-            return { filename: action.value };
+            return { ...state, filename: action.value };
         }
         default: {
             throw new Error(`Unhandled action type: ${action.type}`);

@@ -6,14 +6,17 @@ import { Colors } from './Enums/Colors';
 import { SelectFile } from './Pages/SelectFile';
 import { EditImage } from './Pages/EditImage';
 import { Paths } from './Enums/Paths';
+import { FileProvider } from './Contexts/FileContext';
 
 function App() {
     return (
         <AppContainer>
             <Titlebar />
             <HashRouter>
-                <Route path={Paths.home} exact component={SelectFile} />
-                <Route path={Paths.editImage} component={EditImage} />
+                <FileProvider>
+                    <Route path={Paths.home} exact component={SelectFile} />
+                    <Route path={Paths.editImage} component={EditImage} />
+                </FileProvider>
             </HashRouter>
         </AppContainer>
     );
@@ -26,6 +29,7 @@ const AppContainer = styled.div`
     overflow: hidden;
     background-color: ${Colors.blue300};
     user-select: none;
+    position: absolute;
 `;
 
 export default App;

@@ -59,7 +59,7 @@ const WindowControls = () => {
 
     useEffect(() => {
         electron.receive(ReceiveChannels.isMaximized, (isMax: boolean) => setIsMaximized(isMax));
-    }, [])
+    }, []);
 
     return (
         <WindowControl>

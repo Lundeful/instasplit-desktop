@@ -3,10 +3,12 @@ import { useHistory } from 'react-router';
 import styled from 'styled-components';
 import electron, { ReceiveChannels, SendChannels } from '../Api/Electron';
 import { PrimaryButton } from '../Components/Buttons';
+import { ActionTypes, useFile } from '../Contexts/FileContext';
 import { Paths } from '../Enums/Paths';
 
 export const SelectFile = () => {
     const history = useHistory();
+    const { dispatch } = useFile();
 
     const handleSelectFile = () => {
         electron.send(SendChannels.openSelectFileDialog);
@@ -14,10 +16,11 @@ export const SelectFile = () => {
 
     useEffect(
         () =>
-            electron.receive(ReceiveChannels.fileSelected, (path: any) => {                
+            electron.receive(ReceiveChannels.fileSelected, (path: string) => {
+                dispatch({ type: ActionTypes.setfilename, value: path });
                 history.push(Paths.editImage);
             }),
-        [history]
+        [dispatch, history]
     );
 
     return (
