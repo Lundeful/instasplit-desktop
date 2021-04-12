@@ -7,6 +7,7 @@ import electron, { ReceiveChannels, SendChannels } from '../Api/Electron';
 
 interface TitlebarProps {
     title?: string;
+    isMac?: boolean;
 }
 
 const titlebarHeight = '30px';
@@ -82,7 +83,8 @@ const WindowControls = () => {
     );
 };
 
-export const Titlebar: FC<TitlebarProps> = ({ title }: TitlebarProps) => {
+export const Titlebar: FC<TitlebarProps> = ({ title, isMac}: TitlebarProps) => {
+    if (isMac) return null;
     return (
         <TitlebarStyle>
             <AppIconContainer>

@@ -4,9 +4,9 @@ import * as path from 'path';
 import * as sharp from 'sharp';
 import { ReceiveChannels, SendChannels } from './Channels';
 
+let mainWindow: BrowserWindow;
 const isMac = process.platform === 'darwin';
 const isDev = process.env.NODE_ENV === 'development';
-let mainWindow: BrowserWindow;
 
 const numberOfSplitImages = 3;
 let rawImage: sharp.Sharp;
@@ -18,7 +18,7 @@ const createWindow = () => {
         height: 600 * 1.25,
         minHeight: 400,
         minWidth: 600,
-        frame: false,
+        frame: isMac,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
         },

@@ -8,10 +8,12 @@ import { EditImage } from './Pages/EditImage';
 import { Paths } from './Enums/Paths';
 import { FileProvider } from './Contexts/FileContext';
 
+const isMac = window.navigator.platform.toLowerCase().includes('mac');
+
 function App() {
     return (
         <AppContainer>
-            <Titlebar />
+            <Titlebar isMac={isMac} />
             <HashRouter>
                 <FileProvider>
                     <Route path={Paths.home} exact component={SelectFile} />
