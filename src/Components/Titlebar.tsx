@@ -83,7 +83,7 @@ const WindowControls = () => {
     );
 };
 
-export const Titlebar: FC<TitlebarProps> = ({ title, isMac}: TitlebarProps) => {
+export const Titlebar: FC<TitlebarProps> = ({ title, isMac }: TitlebarProps) => {
     if (isMac) return null;
     return (
         <TitlebarStyle>

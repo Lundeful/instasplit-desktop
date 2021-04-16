@@ -16,8 +16,8 @@ function App() {
             <Titlebar isMac={isMac} />
             <HashRouter>
                 <FileProvider>
-                    <Route path={Paths.home} exact component={SelectFile} />
-                    <Route path={Paths.editImage} component={EditImage} />
+                    <Route path={Paths.editImage} exact component={EditImage} />
+                    <Route path={Paths.home} component={SelectFile} />
                 </FileProvider>
             </HashRouter>
         </AppContainer>

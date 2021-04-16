@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import styled from 'styled-components';
+import { Colors } from '../Enums/Colors';
 
 interface ButtonProps {
     title: string;
@@ -17,7 +18,7 @@ enum ButtonColors {
 const CommonButtonStyle = styled.button`
     // Size and placement
     width: 100%;
-    max-width: 175px;
+    max-width: 220px;
     height: 35px;
 
     // Look
@@ -56,7 +57,13 @@ export const PrimaryButton: FC<ButtonProps> = ({ title, ariaLabel, onClick }: Bu
     );
 };
 
-const SecondaryButtonStyle = styled(CommonButtonStyle)``;
+const SecondaryButtonStyle = styled(CommonButtonStyle)`
+    background-color: ${Colors.blue500};
+    &:hover, &:focus, &:active{
+        background-color: ${Colors.blue500};
+        filter: brightness(1.2);
+    }
+`;
 
 export const SecondaryButton: FC<ButtonProps> = ({ title, ariaLabel, onClick }: ButtonProps) => {
     return (

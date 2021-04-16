@@ -8,9 +8,7 @@ let mainWindow: BrowserWindow;
 const isMac = process.platform === 'darwin';
 const isDev = process.env.NODE_ENV === 'development';
 
-const numberOfSplitImages = 3;
 let rawImage: sharp.Sharp;
-let splitImages: sharp.Sharp[] = [];
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -97,9 +95,9 @@ ipcMain.on('is-maximized', (event, args) => {
     return mainWindow.isMaximized();
 });
 
-ipcMain.on(ReceiveChannels.splitImage, async (event, args) => {
+ipcMain.on(ReceiveChannels.splitImage, async (event, cropInfo) => {
     if (rawImage != null) {
-        saveImage();
+        splitAndSave(cropInfo);
     }
 });
 
@@ -119,42 +117,32 @@ const openImage = async (): Promise<string | undefined | any> => {
         });
 };
 
-// const splitImage = (): void => {
-//     if (rawImage) {
-//     }
-// };
-
-const saveImage = () => {
+const splitAndSave = (cropInfo: {x: number, y: number, width: number, height: number, splitAmount: number}) => {
+    const {width, height, x, y, splitAmount} = cropInfo;
+    const splitImages: sharp.Sharp[] = [];
+    
     if (rawImage) {
         dialog.showSaveDialog(mainWindow).then(async (result) => {
             if (result.canceled) return;
 
-            const { width, height } = await getImageDimensions(rawImage);
             if (width && height) {
-                const splitWidth = Math.floor(width / 3);
-                const splitHeight = Math.floor((splitWidth * height) / width);
-                const topOffset = Math.floor(height / 2 - splitHeight / 2);
+                const splitWidth = Math.floor(width / splitAmount);
+                const topOffset = y;
 
-                for (let index = 0; index < numberOfSplitImages; index++) {
+                for (let index = 0; index < splitAmount; index++) {
                     const splitImage = rawImage.clone();
-                    const leftOffset = splitWidth * index;
+                    const leftOffset = x + splitWidth * index;
 
-                    splitImage.extract({ left: leftOffset, top: topOffset, width: splitWidth, height: splitHeight });
+                    splitImage.extract({ left: leftOffset, top: topOffset, width: splitWidth, height: height });
                     splitImages.push(splitImage);
                 }
 
                 splitImages.forEach((img, index) => {
-                    img.toFile(`${result.filePath}_split_${index + 1}.png`).then((info) => {
-                        info.format = 'png';
+                    img.toFile(`${result.filePath}_split_${index + 1}.jpg`).then((info) => {
+                        info.format = 'jpg';
                     });
                 });
             }
         });
     }
-};
-
-const getImageDimensions = (image: sharp.Sharp) => {
-    return image.metadata().then((meta) => {
-        return { width: meta.width, height: meta.height };
-    });
 };
