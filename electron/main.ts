@@ -23,9 +23,9 @@ const createWindow = () => {
     });
 
     if (isDev) {
-        mainWindow.loadFile('index.html');
-    } else {
         mainWindow.loadURL('http://localhost:3000');
+    } else {
+        mainWindow.loadFile(`${path.join(__dirname, '../index.html')}`);
     }
 
     addListeners(mainWindow);

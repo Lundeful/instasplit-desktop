@@ -1,6 +1,9 @@
 {
     "name": "instasplit",
     "version": "0.1.0",
+    "author": "Christoffer Lund",
+    "description": "Split an image into multiple images for cool swipe effect on Instagram",
+    "homepage": "./",
     "private": true,
     "dependencies": {
         "@testing-library/jest-dom": "^5.11.9",
@@ -30,10 +33,31 @@
         "start": "yarn electron",
         "start-react": "react-scripts start",
         "start-electron": "tsc -p electron && electron .",
-        "build": "react-scripts build",
+        "build": "react-scripts build && tsc -p electron",
         "test": "react-scripts test",
         "eject": "react-scripts eject",
-        "electron": "concurrently \"SET BROWSER=none && yarn start-react\" \"yarn start-electron\""
+        "electron": "concurrently \"SET BROWSER=none && yarn start-react\" \"yarn start-electron\"",
+        "package": "yarn build && electron-builder build  --mac -c.extraMetadata.main=build/electron/main.js --publish never",
+        "dist": "electron-builder",
+        "postinstall": "electron-builder install-app-deps"
+    },
+    "build": {
+        "appId": "com.christofferound.instasplit",
+        "productName": "Instasplit",
+        "files": [
+            "build/**/*",
+            "node_modules/**/*",
+            "package.json"
+        ],
+        "publish": {
+            "provider": "github",
+            "repo": "instasplit",
+            "owner": "lundeful"
+        },
+        "directories": {
+            "buildResources": "public"
+        },
+        "extends": null
     },
     "eslintConfig": {
         "extends": [
@@ -55,7 +79,8 @@
     },
     "devDependencies": {
         "concurrently": "^6.0.0",
-        "electron": "^12.0.1",
+        "electron": "^12.0.4",
+        "electron-builder": "^22.10.5",
         "wait-on": "^5.2.1"
     }
 }

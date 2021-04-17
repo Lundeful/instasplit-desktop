@@ -54,7 +54,7 @@ export const EditImage = () => {
                     onCropComplete={onCropComplete}
                     onZoomChange={setZoom}
                     minZoom={1}
-                    aspect={1}
+                    aspect={aspectRatio}
                     showGrid={false}
                 />
             </CropArea>
