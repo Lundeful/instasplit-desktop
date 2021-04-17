@@ -8,7 +8,7 @@ The app is made using Electron and React, written in TypeScript. It's confirmed 
 
 ### How to install
 
-I'm working on getting automated release builds up on Github. For now you can build it yourself. Clone the repo, run `yarn` to install dependencies. On Windows run `yarn dist:win`. On Mac run `yarn dist:mac`. That will create a dist-folder containing the app to install.
+I'm working on getting automated release builds up on Github. For now you can build it yourself. Clone the repo, run `yarn` to install dependencies and then you can create installers for your OS. On Windows run `yarn dist:win`, for Mac run `yarn dist:mac` and `yarn dist:linux` for Linux (untested). That will create a dist-folder containing the app to install.
 
 ### Running locally
 
