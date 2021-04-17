@@ -84,8 +84,7 @@ ipcMain.on(ReceiveChannels.restoreApp, (event, args) => {
 
 ipcMain.on(ReceiveChannels.selectImage, async (event, args) => {
     const path = await openImage();
-    if (chosenImage != null) {
-        const size = await getImageDimensions();
+    if (chosenImage != null && path) {
         mainWindow.webContents.send(SendChannels.fileSelected, path);
     }
 });
@@ -160,11 +159,5 @@ const splitAndSave = async (cropInfo: {
             });
         });
         return true;
-    });
-};
-
-const getImageDimensions = () => {
-    return chosenImage?.metadata().then(meta => {
-        return { width: meta.width, height: meta.height };
     });
 };

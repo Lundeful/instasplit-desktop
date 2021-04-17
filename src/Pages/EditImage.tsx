@@ -30,11 +30,6 @@ export const EditImage = () => {
     useEffect(() => {
         electron.receive(ReceiveChannels.success, () => setSuccess(true));
         electron.receive(ReceiveChannels.error, () => setError(true));
-
-        return () => {
-            electron.removeAllListeners(ReceiveChannels.success);
-            electron.removeAllListeners(ReceiveChannels.error);
-        }
     }, []);
 
     useEffect(() => {
