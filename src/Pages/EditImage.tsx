@@ -6,8 +6,9 @@ import { PrimaryButton, SecondaryButton } from '../Components/Buttons';
 import { useFile } from '../Contexts/FileContext';
 import { Colors } from '../Enums/Colors';
 import { Paths } from '../Enums/Paths';
-import { VscCheck, VscError } from 'react-icons/vsc';
 import electron, { ReceiveChannels, SendChannels } from '../Api/Electron';
+import { ErrorMessage } from '../Components/ErrorMessage';
+import { SuccessMessage } from '../Components/SuccessMessage';
 
 export const EditImage = () => {
     const { state } = useFile();
@@ -19,18 +20,30 @@ export const EditImage = () => {
     const [zoom, setZoom] = useState(1);
     const [pixelsCrop, setPixelsCrop] = useState({ x: 0, y: 0, w: 0, h: 0 });
     const [splitAmount, setSplitAmount] = useState(2);
+    const [aspectWidth, setAspectWidth] = useState<number | undefined>(4);
+    const [aspectHeight, setAspectHeight] = useState(5);
+    const [aspectRatio, setAspectRatio] = useState(4 / 5);
 
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState(false);
 
-    const img = new Image();
-    img.src = state.path;
-    const aspectRatio = (splitAmount * img.width) / img.height;
-
     useEffect(() => {
         electron.receive(ReceiveChannels.success, () => setSuccess(true));
         electron.receive(ReceiveChannels.error, () => setError(true));
+
+        return () => {
+            electron.removeAllListeners(ReceiveChannels.success);
+            electron.removeAllListeners(ReceiveChannels.error);
+        }
     }, []);
+
+    useEffect(() => {
+        if (!aspectHeight || !aspectWidth) {
+            setAspectRatio(4 / 5);
+            return;
+        }
+        setAspectRatio((splitAmount * aspectWidth) / aspectHeight);
+    }, [splitAmount, aspectHeight, aspectWidth]);
 
     const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
         setPixelsCrop(croppedAreaPixels);
@@ -72,26 +85,48 @@ export const EditImage = () => {
                         <SplitAmountInput
                             defaultValue={splitAmount}
                             type='range'
-                            min='2'
+                            min='1'
                             max='10'
-                            onChange={(e) => setSplitAmount(parseInt(e.target.value))}
+                            onChange={e => setSplitAmount(parseInt(e.target.value))}
                         />
+                        {splitAmount === 1 && <p>Split into 1...Really??</p>}
                     </SplitAmountContainer>
+                    <AspectRatioContainer>
+                        <AspectRatioText>Aspect ratio</AspectRatioText>
+                        <AspectInputGroup>
+                            <AspectLabel>Width</AspectLabel>
+                            <AspectRatioInput
+                                title='Width'
+                                aria-label='Aspect ratio width'
+                                type='number'
+                                min='1'
+                                max='10000'
+                                defaultValue='4'
+                                value={aspectWidth}
+                                onChange={e => setAspectWidth(parseInt(e.target.value))}
+                                onBlur={e => !e.target.value && setAspectWidth(4)}
+                            />
+                        </AspectInputGroup>
+                        <AspectInputGroup>
+                            <AspectLabel>Height</AspectLabel>
+                            <AspectRatioInput
+                                title='Height'
+                                aria-label='Aspect ratio height'
+                                type='number'
+                                min='1'
+                                max='10000'
+                                defaultValue='5'
+                                value={aspectHeight}
+                                onChange={e => setAspectHeight(parseInt(e.target.value))}
+                                onBlur={e => !e.target.value && setAspectHeight(5)}
+                            />
+                        </AspectInputGroup>
+                    </AspectRatioContainer>
                     <SubmitContainer>
                         <PrimaryButton title='Split Image' onClick={onSubmit} />
                     </SubmitContainer>
-                    {success && !error && (
-                        <SuccessMessage>
-                            <VscCheck color={Colors.green500} />
-                            <span>Saved</span>
-                        </SuccessMessage>
-                    )}
-                    {error && (
-                        <ErrorMessage>
-                            <VscError color={'red'} />
-                            <span>Something went wrong, try again</span>
-                        </ErrorMessage>
-                    )}
+                    {success && !error && <SuccessMessage />}
+                    {error && <ErrorMessage />}
                 </Tools>
             </Sidebar>
         </Container>
@@ -138,7 +173,8 @@ const SplitAmountContainer = styled.div`
 const SplitAmountText = styled.div`
     display: flex;
     justify-content: space-between;
-    margin: 5px;
+    margin-bottom: 10px;
+    font-size: 20px;
 `;
 
 const SplitAmountInput = styled.input`
@@ -154,22 +190,38 @@ const SubmitContainer = styled.div`
     margin-bottom: 20px;
 `;
 
-const SuccessMessage = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    color: white;
-`;
-
-const ErrorMessage = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    color: white;
-`;
-
 const SelectNewImageContainer = styled.div`
     margin: 10px 0;
+`;
+
+const AspectRatioContainer = styled.div`
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    border-radius: 5px;
+    width: 100%;
+`;
+
+const AspectRatioText = styled.div`
+    margin-bottom: 5px;
+    font-size: 20px;
+`;
+
+const AspectInputGroup = styled.div`
+    display: flex;
+    justify-content: space-between;
+`;
+
+const AspectLabel = styled.label``;
+
+const AspectRatioInput = styled.input`
+    width: 70px;
+    background-color: transparent;
+    border: none;
+    text-align: center;
+    font-size: 16px;
+    color: white;
+    border-bottom: 2px solid white;
+    outline: none;
 `;

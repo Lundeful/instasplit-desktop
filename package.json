@@ -31,7 +31,7 @@
     "main": "build/electron/main.js",
     "scripts": {
         "start": "yarn electron",
-        "start-react": "react-scripts start",
+        "start-react": "SET BROWSER=none && react-scripts start",
         "start-electron": "tsc -p electron && electron .",
         "build": "react-scripts build && tsc -p electron",
         "test": "react-scripts test",

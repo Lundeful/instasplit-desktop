@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
-import { useHistory } from "react-router";
-import styled from "styled-components";
-import electron, { ReceiveChannels, SendChannels } from "../Api/Electron";
-import { PrimaryButton } from "../Components/Buttons";
-import { ActionTypes, useFile } from "../Contexts/FileContext";
-import { Paths } from "../Enums/Paths";
+import React, { useEffect } from 'react';
+import { useHistory } from 'react-router';
+import styled from 'styled-components';
+import electron, { ReceiveChannels, SendChannels } from '../Api/Electron';
+import { PrimaryButton } from '../Components/Buttons';
+import { ActionTypes, useFile } from '../Contexts/FileContext';
+import { Paths } from '../Enums/Paths';
 
 export const SelectFile = () => {
     const history = useHistory();

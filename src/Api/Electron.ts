@@ -5,6 +5,7 @@ interface Electron {
     send: (channel: SendChannels, data?: any) => any;
     subscribe: (channel: string, listener: Listener) => Unsubscribe;
     receive: (channel: ReceiveChannels, func: any) => void;
+    removeAllListeners: (channel: ReceiveChannels) => void;
 }
 
 export enum SendChannels {

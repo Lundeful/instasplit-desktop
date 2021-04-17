@@ -23,8 +23,10 @@ const createWindow = () => {
     });
 
     if (isDev) {
+        console.info('Running Electron in dev mode from Localhost:3000');
         mainWindow.loadURL('http://localhost:3000');
     } else {
+        console.info('Running production build');
         mainWindow.loadFile(`${path.join(__dirname, '../index.html')}`);
     }
 
@@ -61,7 +63,7 @@ const addListeners = (mainWindow: BrowserWindow) => {
 };
 
 ipcMain.on(ReceiveChannels.closeApp, (event, args) => {
-    BrowserWindow.getAllWindows().forEach((win) => win.close());
+    BrowserWindow.getAllWindows().forEach(win => win.close());
     if (!isMac) app.quit();
 });
 
@@ -113,7 +115,7 @@ const openImage = async (): Promise<string | undefined | any> => {
             properties: ['openFile'],
             filters: [{ name: 'Images', extensions: ['jpg', 'png'] }],
         })
-        .then((result) => {
+        .then(result => {
             if (result.canceled) return;
             const filepath = result.filePaths[0];
             const image = fs.readFileSync(filepath);
@@ -133,7 +135,7 @@ const splitAndSave = async (cropInfo: {
     console.log(cropInfo);
     if (!chosenImage) return false;
 
-    return dialog.showSaveDialog(mainWindow).then(async (result) => {
+    return dialog.showSaveDialog(mainWindow).then(async result => {
         if (result.canceled) return false;
 
         // Split details
@@ -153,7 +155,7 @@ const splitAndSave = async (cropInfo: {
 
         // Save
         splitImages.forEach((img, index) => {
-            img.toFile(`${result.filePath}_split_${index + 1}.jpg`).then((info) => {
+            img.toFile(`${result.filePath}_split_${index + 1}.jpg`).then(info => {
                 info.format = 'jpg';
             });
         });
@@ -162,7 +164,7 @@ const splitAndSave = async (cropInfo: {
 };
 
 const getImageDimensions = () => {
-    return chosenImage?.metadata().then((meta) => {
+    return chosenImage?.metadata().then(meta => {
         return { width: meta.width, height: meta.height };
     });
 };

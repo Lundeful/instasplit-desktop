@@ -17,7 +17,7 @@ function App() {
             <HashRouter>
                 <FileProvider>
                     <Route path={Paths.editImage} exact component={EditImage} />
-                    <Route path={Paths.home} component={SelectFile} />
+                    <Route path={Paths.home} exact component={SelectFile} />
                 </FileProvider>
             </HashRouter>
         </AppContainer>
@@ -32,6 +32,7 @@ const AppContainer = styled.div`
     background-color: ${Colors.blue300};
     user-select: none;
     position: absolute;
+    box-sizing: border-box;
 `;
 
 export default App;
