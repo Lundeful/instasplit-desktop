@@ -12,7 +12,7 @@ I'm working on getting automated release builds up on Github. For now you can bu
 
 ### Running locally
 
-Run scripts in the project directory. Run `yarn` to install dependencies. I recommend using `yarn`. If you want to use `npm` you must swap out `yarn` for `npm run` in the scripts.
+I recommend using `yarn`. Run scripts in the project directory. First run `yarn` to install dependencies. . If you want to use `npm` you must swap out `yarn` for `npm run` in the scripts.
 
 ### `yarn start`
 
