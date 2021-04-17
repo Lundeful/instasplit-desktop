@@ -1,5 +1,7 @@
 # Instasplit
 
+![](https://github.com/lundeful/instasplitter/actions/workflows/build.yml/badge.svg)
+
 Instasplit is a desktop app for splitting an image into multiple images. When the result is posted to Instagram you can swipe as if it was one long seamless image. 
 It was created as a tool for myself to use, and is more or less just a prototype.
 
