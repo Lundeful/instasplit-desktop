@@ -20,6 +20,8 @@ export enum SendChannels {
 export enum ReceiveChannels {
     fileSelected = 'filepath-selected',
     isMaximized = 'is-maximized',
+    success = 'success',
+    error = 'error',
 }
 
 const electron = (window as any).electron as Electron;

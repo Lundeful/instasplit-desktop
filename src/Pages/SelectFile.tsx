@@ -17,7 +17,7 @@ export const SelectFile = () => {
     useEffect(
         () =>
             electron.receive(ReceiveChannels.fileSelected, (path: string) => {
-                dispatch({ type: ActionTypes.setfilename, value: `instasplit://${path}` });
+                dispatch({ type: ActionTypes.setpath, value: `instasplit://${path}` });
                 history.push(Paths.editImage);
             }),
         [dispatch, history]

@@ -7,42 +7,38 @@ import { useFile } from '../Contexts/FileContext';
 import { Colors } from '../Enums/Colors';
 import { Paths } from '../Enums/Paths';
 import { VscCheck, VscError } from 'react-icons/vsc';
-import electron, { SendChannels } from '../Api/Electron';
+import electron, { ReceiveChannels, SendChannels } from '../Api/Electron';
 
 export const EditImage = () => {
     const { state } = useFile();
     const history = useHistory();
 
-    const [size, setSize] = useState({h: 1, w: 1});
+    if (!state.path) history.push(Paths.home);
+
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [pixelsCrop, setPixelsCrop] = useState({ x: 0, y: 0, w: 0, h: 0 });
     const [splitAmount, setSplitAmount] = useState(2);
-    const [aspectRatio, setAspectRatio] = useState(1);
 
-    const [success, setSuccess] = useState<boolean>(false);
-    const [error, setError] = useState<boolean>(false);
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState(false);
+
+    const img = new Image();
+    img.src = state.path;
+    const aspectRatio = (splitAmount * img.width) / img.height;
+
+    useEffect(() => {
+        electron.receive(ReceiveChannels.success, () => setSuccess(true));
+        electron.receive(ReceiveChannels.error, () => setError(true));
+    }, []);
 
     const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
         setPixelsCrop(croppedAreaPixels);
     }, []);
 
-    useEffect(() => {
-        const img = new Image();
-        img.src = state.filename;
-        setSize({h: img.height, w: img.width});
-        // setAspectRatio((splitAmount * img.width ) / img.height);
-    }, []);
-
-    const changeSplitAmount = (splitAmount: number) => {
-        setSplitAmount(splitAmount);
-        setAspectRatio((splitAmount *  size.w) / size.h);
-    };
-
-    // Return to file select
-    if (!state.filename) history.push(Paths.home);
-
     const onSubmit = () => {
+        setError(false);
+        setSuccess(false);
         const cropInfo = { ...pixelsCrop, splitAmount: splitAmount };
         electron.send(SendChannels.splitImage, cropInfo);
     };
@@ -51,21 +47,21 @@ export const EditImage = () => {
         <Container>
             <CropArea>
                 <Cropper
-                    image={state.filename}
+                    image={state.path}
                     crop={crop}
                     zoom={zoom}
                     onCropChange={setCrop}
                     onCropComplete={onCropComplete}
                     onZoomChange={setZoom}
                     minZoom={1}
-                    aspect={aspectRatio}
+                    aspect={1}
                     showGrid={false}
                 />
             </CropArea>
             <Sidebar>
                 <Tools>
                     <SelectNewImageContainer>
-                        <SecondaryButton title='Select new image' />
+                        <SecondaryButton title='Back' onClick={() => history.push(Paths.home)} />
                     </SelectNewImageContainer>
                     <Title>Settings</Title>
                     <SplitAmountContainer>
@@ -78,13 +74,13 @@ export const EditImage = () => {
                             type='range'
                             min='2'
                             max='10'
-                            onChange={(e) => changeSplitAmount(parseInt(e.target.value))}
+                            onChange={(e) => setSplitAmount(parseInt(e.target.value))}
                         />
                     </SplitAmountContainer>
                     <SubmitContainer>
                         <PrimaryButton title='Split Image' onClick={onSubmit} />
                     </SubmitContainer>
-                    {success && (
+                    {success && !error && (
                         <SuccessMessage>
                             <VscCheck color={Colors.green500} />
                             <span>Saved</span>

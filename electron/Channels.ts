@@ -10,4 +10,6 @@ export enum ReceiveChannels {
 export enum SendChannels {
     fileSelected = 'filepath-selected',
 	isMaximized = 'is-maximized',
+    success = 'success',
+    error = 'error',
 }

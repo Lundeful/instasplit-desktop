@@ -8,7 +8,7 @@ let mainWindow: BrowserWindow;
 const isMac = process.platform === 'darwin';
 const isDev = process.env.NODE_ENV === 'development';
 
-let rawImage: sharp.Sharp;
+let chosenImage: sharp.Sharp;
 
 const createWindow = () => {
     mainWindow = new BrowserWindow({
@@ -29,17 +29,15 @@ const createWindow = () => {
     }
 
     addListeners(mainWindow);
-    const protocolName = 'instasplit'
+    const protocolName = 'instasplit';
     protocol.registerFileProtocol(protocolName, (request, callback) => {
-        const url = request.url.replace(`${protocolName}://`, '')
+        const url = request.url.replace(`${protocolName}://`, '');
         try {
-          return callback(decodeURIComponent(url))
+            return callback(decodeURIComponent(url));
+        } catch (error) {
+            console.error(error);
         }
-        catch (error) {
-          // Handle the error as needed
-          console.error(error)
-        }
-      })
+    });
 };
 
 app.whenReady().then(createWindow);
@@ -84,20 +82,28 @@ ipcMain.on(ReceiveChannels.restoreApp, (event, args) => {
 
 ipcMain.on(ReceiveChannels.selectImage, async (event, args) => {
     const path = await openImage();
-    if (rawImage != null) mainWindow.webContents.send(SendChannels.fileSelected, path);
+    if (chosenImage != null) {
+        const size = await getImageDimensions();
+        mainWindow.webContents.send(SendChannels.fileSelected, path);
+    }
+});
+
+ipcMain.on('is-maximized', (event, args) => {
+    return mainWindow.isMaximized();
 });
 
 const sendIsMaximised = () => {
     mainWindow.webContents.send(SendChannels.isMaximized, mainWindow.isMaximized());
 };
 
-ipcMain.on('is-maximized', (event, args) => {
-    return mainWindow.isMaximized();
-});
-
 ipcMain.on(ReceiveChannels.splitImage, async (event, cropInfo) => {
-    if (rawImage != null) {
-        splitAndSave(cropInfo);
+    if (chosenImage != null) {
+        try {
+            const didSave = await splitAndSave(cropInfo);
+            if (didSave) mainWindow.webContents.send(SendChannels.success);
+        } catch {
+            mainWindow.webContents.send(SendChannels.error);
+        }
     }
 });
 
@@ -112,37 +118,51 @@ const openImage = async (): Promise<string | undefined | any> => {
             const filepath = result.filePaths[0];
             const image = fs.readFileSync(filepath);
             const sharpImage = sharp(image);
-            rawImage = sharpImage;
+            chosenImage = sharpImage;
             return filepath.replace(/\\/g, '\\');
         });
 };
 
-const splitAndSave = (cropInfo: {x: number, y: number, width: number, height: number, splitAmount: number}) => {
-    const {width, height, x, y, splitAmount} = cropInfo;
-    const splitImages: sharp.Sharp[] = [];
-    
-    if (rawImage) {
-        dialog.showSaveDialog(mainWindow).then(async (result) => {
-            if (result.canceled) return;
+const splitAndSave = async (cropInfo: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    splitAmount: number;
+}): Promise<boolean> => {
+    console.log(cropInfo);
+    if (!chosenImage) return false;
 
-            if (width && height) {
-                const splitWidth = Math.floor(width / splitAmount);
-                const topOffset = y;
+    return dialog.showSaveDialog(mainWindow).then(async (result) => {
+        if (result.canceled) return false;
 
-                for (let index = 0; index < splitAmount; index++) {
-                    const splitImage = rawImage.clone();
-                    const leftOffset = x + splitWidth * index;
+        // Split details
+        const { width, height, x, y, splitAmount } = cropInfo;
+        const splitWidth = Math.floor(width / splitAmount);
+        const topOffset = y;
 
-                    splitImage.extract({ left: leftOffset, top: topOffset, width: splitWidth, height: height });
-                    splitImages.push(splitImage);
-                }
+        // Split
+        const splitImages: sharp.Sharp[] = [];
+        for (let index = 0; index < splitAmount; index++) {
+            const splitImage = chosenImage.clone();
+            const leftOffset = x + splitWidth * index;
 
-                splitImages.forEach((img, index) => {
-                    img.toFile(`${result.filePath}_split_${index + 1}.jpg`).then((info) => {
-                        info.format = 'jpg';
-                    });
-                });
-            }
+            splitImage.extract({ left: leftOffset, top: topOffset, width: splitWidth, height: height });
+            splitImages.push(splitImage);
+        }
+
+        // Save
+        splitImages.forEach((img, index) => {
+            img.toFile(`${result.filePath}_split_${index + 1}.jpg`).then((info) => {
+                info.format = 'jpg';
+            });
         });
-    }
+        return true;
+    });
+};
+
+const getImageDimensions = () => {
+    return chosenImage?.metadata().then((meta) => {
+        return { width: meta.width, height: meta.height };
+    });
 };
