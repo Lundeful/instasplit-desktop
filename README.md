@@ -2,8 +2,7 @@
 
 ![](https://github.com/lundeful/instasplitter/actions/workflows/build.yml/badge.svg)
 
-Instasplit is a desktop app for splitting an image into multiple images. When the result is posted to Instagram you can swipe as if it was one long seamless image. 
-It was created as a tool for myself to use, and is more or less just a prototype.
+Instasplit is a multi-platform desktop app for splitting an image into multiple images for use on Instagram. When posted to Instagram you can swipe as if it was one long seamless image. I created it as a tool to save myself from doing it manually and as a chance to learn Electron. It's more or less just a prototype so no tests or pretty code. At least it's working ¯\\\_(ツ)_/¯.
 
 The app is made using Electron and React, written in TypeScript. It's confirmed working on Windows and Mac and there is a build script if you want to run it on Linux.
 
