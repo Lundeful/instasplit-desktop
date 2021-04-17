@@ -37,7 +37,7 @@
         "test": "react-scripts test",
         "eject": "react-scripts eject",
         "electron": "concurrently \"SET BROWSER=none && yarn start-react\" \"yarn start-electron\"",
-        "package": "yarn build && electron-builder build -c.extraMetadata.main=build/electron/main.js --publish never",
+        "package": "yarn build && electron-builder build --mac --win --linux -c.extraMetadata.main=build/electron/main.js --publish never",
         "dist": "electron-builder",
         "postinstall": "electron-builder install-app-deps"
     },
