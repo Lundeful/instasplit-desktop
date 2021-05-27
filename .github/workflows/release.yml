@@ -28,7 +28,7 @@ jobs:
       - name: Build on Windows
         run: yarn dist:win
       - name: version
-        run: echo "::set-output name=version::$(./bin/instasplit --version)"
+        run : echo ${{ github.event.release.tag_name }}
         id: version
       - name: release
         uses: actions/create-release@v1
