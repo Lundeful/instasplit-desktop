@@ -28,7 +28,7 @@ jobs:
       - name: Build on Windows
         run: yarn dist:win
       - name: version
-        run : echo ${{ github.event.release.tag_name }}
+        run : echo "v0.1"
         id: version
       - name: release
         uses: actions/create-release@v1
