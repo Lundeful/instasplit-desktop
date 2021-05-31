@@ -1,10 +1,9 @@
 {
     "name": "instasplit",
-    "version": "0.1.0",
+    "version": "0.1.2",
     "author": "Christoffer Lund",
     "description": "Split an image into multiple images for cool swipe effect on Instagram",
     "homepage": "./",
-    "private": true,
     "dependencies": {
         "@testing-library/jest-dom": "^5.11.9",
         "@testing-library/react": "^11.2.5",
