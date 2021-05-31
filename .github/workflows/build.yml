@@ -10,34 +10,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_mac:
-    runs-on: macOS-latest
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
     steps:
-    - uses: actions/checkout@master
-      with:
-        ref: master
-    - uses: actions/setup-node@master
-      with:
-        node-version: 14.16.1
-    - name: Install dependencies
-      run: yarn install
-    - name: Build on MacOS
-      run: yarn dist:mac
-    - name: See directory
-      run: ls dist
-      
-  build_win:
-    runs-on: windows-2016
-    steps:
-    - uses: actions/checkout@master
-      with:
-        ref: master
-    - uses: actions/setup-node@master
-      with:
-        node-version: 14.16.1
-    - name: Install dependencies
-      run: yarn install
-    - name: Build on Windows
-      run: yarn dist:win
-    - name: See directory
-      run: ls dist
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.16.1
+
+      - name: Build/release Electron app
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          # GitHub token, automatically provided to the action
+          # (No need to define this secret in the repo settings)
+          github_token: ${{ secrets.github_token }}
+
+          # If the commit is tagged with a version (e.g. "v1.0.0"),
+          # release the app after building
+          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
