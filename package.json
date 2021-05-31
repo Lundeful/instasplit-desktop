@@ -60,6 +60,7 @@
         },
         "extends": null
     },
+    "release": "electron-builder",
     "eslintConfig": {
         "extends": [
             "react-app",
