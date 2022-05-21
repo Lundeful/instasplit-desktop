@@ -1,4 +1,7 @@
-# Instasplit
+## This project is no longer maintained
+I have created a newer and better web version at [instasplit.app](https://instasplit.app).
+
+# Instasplit for desktop (Deprecated)
 
 ![](https://github.com/lundeful/instasplitter/actions/workflows/build.yml/badge.svg)
 
